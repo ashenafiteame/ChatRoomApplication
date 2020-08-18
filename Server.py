@@ -19,9 +19,9 @@ def broadcast(msg, prefex=""):
 
 def handle_client(conn, address):
     name = conn.recv(1024).decode()
-    welcome = "Wellcome " + name + ", Type #quite to leave the chat room"
-    conn.recv(bytes(welcome, "utf8"))
-    msg = name + "has resently joined"
+    welcome = "Welcome " + name + ", Type #quite to leave the chat room"
+    conn.send(bytes(welcome, "utf8"))
+    msg = name + " has recently joined"
 
     broadcast(bytes(msg, "utf8"))
     clients[conn] = name
@@ -29,19 +29,19 @@ def handle_client(conn, address):
     while True:
         msg = conn.recv(1024)
         if msg != bytes('#quite', 'utf8'):
-            broadcast(msg, name) + ":"
+            broadcast(msg, name + ":")
         else:
             conn.send(bytes("#quite", "utf8"))
             conn.close()
             del clients[conn]
-            broadcast(bytes(name + "has left "))
+            broadcast(bytes(name + " has left "))
 
 
 def accept_client_connection():
     while True:
         client_conn, client_address = sock.accept()
-        print(client_address, "has connected")
-        client_conn.send("welcomme to the chat room".encode('utf8'))
+        print(client_address, " has connected")
+        client_conn.send("welcome to the chat room".encode('utf8'))
         address[client_conn] = client_address
 
         Thread(target=handle_client, args=(client_conn, client_address)).start()
@@ -49,7 +49,7 @@ def accept_client_connection():
 
 if __name__ == '__main__':
     sock.listen(5)
-    print("the socket is running  and listering to clients")
+    print("the socket is running  and listening to clients")
 
     t1 = Thread(target=accept_client_connection)
     t1.start()
